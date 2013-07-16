@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+          margin: 0px;
+          padding: 0px;
+          overflow: hidden;
+      }
+
+      #twitter-name {
+          bottom: 0;
+          position: fixed;
+          right: 0;
+          border: 0;
+          box-shadow: 0 0 5px 5px #fff;
+          width: 300px;
+          padding: 10px;
+          font-size: 20px;
+          outline: 0;
+      }
+
+    </style>
+    <title>Twitter galaxy</title>
+  </head>
+  <body>
+    <div id="container"></div>
+    <input id="twitter-name" type="text" placeholder="Twitter name (not working yet)" />
+    <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.5.4.min.js"></script>
+    <script defer="defer">
+    !function() {
+        var stage = new Kinetic.Stage({
+            container: 'container'
+        }),
+        starTweens = [],
+        resizeTimeoutId,
+        addBackground = function(stage) {
+            var layer = new Kinetic.Layer(),
+                rect = new Kinetic.Rect({
+                    x: 0,
+                    y: 0,
+                    fill: '#000',
+                    height: stage.getHeight(),
+                    width: stage.getWidth()
+                });       
+            layer.add(rect);
+            return layer;
+        },
+        addMiniStars = function() {
+            var layer = new Kinetic.Layer(),
+                star, i = 0;
+
+            for(; i < stage.getWidth() / 2; i++) { 
+                star = new Kinetic.Circle({
+                    x: Math.floor((Math.random()*stage.getWidth())+1),
+                    y: Math.floor((Math.random()*stage.getHeight())+1),
+                    fill: '#fff',
+                    radius: 1
+                });       
+                layer.add(star);       
+            }
+
+            return layer;   
+        },
+        addStars = function() {
+            var layer = new Kinetic.Layer(),
+                i = 0,
+                initStar = function() {
+                    var star = new Kinetic.Circle({
+                        x: Math.floor((Math.random()*stage.getWidth())+1),
+                        y: Math.floor((Math.random()*stage.getHeight())+1),
+                        fill: '#fff',
+                        radius: 2,
+                        shadowColor: '#fff',
+                        shadowBlur: 2
+                    });       
+                    layer.add(star);       
+
+                    var tween = new Kinetic.Tween({
+                        node: star, 
+                        radius: 8,
+                        shadowBlur: 8,
+                        duration: 2.5,
+                        easing: Kinetic.Easings.EaseInOut,
+                        onFinish: function() {
+                            tween.reverse();
+                        }
+                    });
+
+                    return tween;            
+                };
+
+            for(; i < stage.getWidth() / 5; i++) { 
+                starTweens.push(initStar());                    
+            }
+
+            return layer;   
+        },
+        flash = function() {
+            var tween = starTweens[Math.floor((Math.random()*starTweens.length))];
+            tween.play();
+        },
+        init = function() {
+            stage.clear();
+            stage.setWidth(window.innerWidth);
+            stage.setHeight(window.innerHeight);          
+
+            for(var i = 0; i < starTweens.length; i++) { 
+                starTweens[i].destroy();
+            }
+
+            starTweens = [];
+            stage.add(addBackground(stage));
+            stage.add(addMiniStars(stage));
+            stage.add(addStars(stage));       
+        },
+        resize = function() {        
+            clearTimeout(resizeTimeoutId);
+            resizeTimeoutId = setTimeout(function() {
+                init();
+            }, 250);   
+        };
+
+        var lastTime = 0,
+            anim = new Kinetic.Animation(function(frame) {
+                if(frame.time >= lastTime + 5000) {
+                    lastTime = frame.time;
+                    flash();
+                    flash();
+                    flash();
+                    flash();
+                    flash();
+                }
+            });
+        init();
+        anim.start();
+
+
+        window.onresize = resize;
+    }();
+    </script>
+  </body>
+</html>
